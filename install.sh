@@ -5,7 +5,7 @@ set -e
 echo "🚀 Powerlevel10k + Zsh setup voor Debian/Ubuntu"
 
 # --- Systeemcheck ---
-if ! grep -qi "debian" /etc/os-release && ! grep -qi "ubuntu" /etc/os-release; then
+if ! grep -qiE "(debian|ubuntu)" /etc/os-release; then
   echo "❌ Alleen bedoeld voor Debian/Ubuntu systemen"
   exit 1
 fi
@@ -19,12 +19,13 @@ sudo apt install -y git curl zsh unzip fontconfig
 if [ "$SHELL" != "$(which zsh)" ]; then
   echo "🌀 Zsh wordt ingesteld als standaard shell"
   chsh -s "$(which zsh)"
+  echo "⚠️  Log uit en weer in om de shell-wijziging te activeren"
 fi
 
 # --- Oh My Zsh ---
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   echo "💡 Installing Oh My Zsh..."
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
@@ -58,14 +59,19 @@ mkdir -p "$FONT_DIR"
 echo "🔤 Installing MesloLGS Nerd Fonts..."
 MESLO_URL_BASE="https://github.com/romkatv/powerlevel10k-media/raw/master"
 fonts=(
-  "MesloLGS NF Regular.ttf"
-  "MesloLGS NF Bold.ttf"
-  "MesloLGS NF Italic.ttf"
-  "MesloLGS NF Bold Italic.ttf"
+  "MesloLGS%20NF%20Regular.ttf"
+  "MesloLGS%20NF%20Bold.ttf"
+  "MesloLGS%20NF%20Italic.ttf"
+  "MesloLGS%20NF%20Bold%20Italic.ttf"
 )
 
 for font in "${fonts[@]}"; do
-  curl -fsSL "$MESLO_URL_BASE/$font" -o "$FONT_DIR/$font"
+  # URL-decode de bestandsnaam voor lokale opslag
+  local_name=$(echo "$font" | sed 's/%20/ /g')
+  if [ ! -f "$FONT_DIR/$local_name" ]; then
+    echo "Downloading: $local_name"
+    curl -fsSL "$MESLO_URL_BASE/$font" -o "$FONT_DIR/$local_name"
+  fi
 done
 
 fc-cache -f "$FONT_DIR"
@@ -76,7 +82,30 @@ echo "✅ Fonts geïnstalleerd. Zet je terminal-font op 'MesloLGS NF'."
 REPO_URL="https://raw.githubusercontent.com/timvdhoorn/powerlevel10k-debian/main"
 
 echo "⚙️ Downloading .zshrc and .p10k.zsh"
-curl -fsSL "$REPO_URL/.zshrc" -o "$HOME/.zshrc"
-curl -fsSL "$REPO_URL/.p10k.zsh" -o "$HOME/.p10k.zsh"
 
-echo "✅ Setup voltooid. Start een nieuwe terminal of voer 'zsh' uit."
+# Backup bestaande configs
+[ -f "$HOME/.zshrc" ] && cp "$HOME/.zshrc" "$HOME/.zshrc.backup.$(date +%Y%m%d_%H%M%S)"
+[ -f "$HOME/.p10k.zsh" ] && cp "$HOME/.p10k.zsh" "$HOME/.p10k.zsh.backup.$(date +%Y%m%d_%H%M%S)"
+
+# Download nieuwe configs met error handling
+if curl -fsSL "$REPO_URL/.zshrc" -o "$HOME/.zshrc.tmp"; then
+  mv "$HOME/.zshrc.tmp" "$HOME/.zshrc"
+  echo "✅ .zshrc gedownload"
+else
+  echo "❌ Fout bij downloaden van .zshrc"
+  exit 1
+fi
+
+if curl -fsSL "$REPO_URL/.p10k.zsh" -o "$HOME/.p10k.zsh.tmp"; then
+  mv "$HOME/.p10k.zsh.tmp" "$HOME/.p10k.zsh"
+  echo "✅ .p10k.zsh gedownload"
+else
+  echo "❌ Fout bij downloaden van .p10k.zsh"
+  exit 1
+fi
+
+echo ""
+echo "✅ Setup voltooid!"
+echo "🔄 Start een nieuwe terminal of voer 'zsh' uit."
+echo "🎨 Configureer je terminal om 'MesloLGS NF' als font te gebruiken."
+echo ""
