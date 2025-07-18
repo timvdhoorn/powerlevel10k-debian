@@ -94,7 +94,6 @@ plugins=(
   fast-syntax-highlighting
   zsh-autosuggestions
   zsh-autocomplete
-  zsh-history-substring-search
   sudo
   extract
   command-not-found
