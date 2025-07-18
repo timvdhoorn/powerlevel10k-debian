@@ -20,19 +20,6 @@ if [ -d "/var/lib/flatpak/exports/bin" ]; then
   export PATH=$PATH:/var/lib/flatpak/exports/bin
 fi
 
-# Color schemes
-export CLICOLOR=1
-export LSCOLORS=ExFxBxDxCxegedabagacad
-
-# Colored less
-export LESS_TERMCAP_mb=$'\e[1;32m'     # begin bold
-export LESS_TERMCAP_md=$'\e[1;32m'     # begin blink
-export LESS_TERMCAP_me=$'\e[0m'        # reset bold/blink
-export LESS_TERMCAP_se=$'\e[0m'        # reset reverse video
-export LESS_TERMCAP_so=$'\e[01;33m'    # begin reverse video
-export LESS_TERMCAP_ue=$'\e[0m'        # reset underline
-export LESS_TERMCAP_us=$'\e[1;4;31m'   # begin underline
-
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -107,7 +94,6 @@ plugins=(
   fast-syntax-highlighting
   zsh-autosuggestions
   zsh-autocomplete
-  colored-man-pages
   sudo
   extract
   command-not-found
@@ -142,15 +128,6 @@ setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_SPACE
 setopt SHARE_HISTORY
 
-# Auto-correction settings
-setopt CORRECT
-setopt CORRECT_ALL
-
-# Directory navigation
-setopt AUTO_CD
-setopt AUTO_PUSHD
-setopt PUSHD_IGNORE_DUPS
-
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
@@ -160,23 +137,11 @@ setopt PUSHD_IGNORE_DUPS
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
-
-# Directory navigation aliases
 alias ..='cd ..'
 alias ...='cd ../..'
-alias ....='cd ../../..'
-alias .....='cd ../../../..'
-alias d='dirs -v'  # Show directory stack
-
-# Colored grep
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
-
-# Disable correction for specific commands
-alias cp='nocorrect cp'
-alias mv='nocorrect mv'
-alias mkdir='nocorrect mkdir'
 
 # System aliases
 alias update='sudo apt update && sudo apt upgrade'
