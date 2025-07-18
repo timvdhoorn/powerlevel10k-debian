@@ -83,17 +83,35 @@ REPO_URL="https://raw.githubusercontent.com/timvdhoorn/powerlevel10k-debian/main
 
 echo "⚙️ Downloading .zshrc and .p10k.zsh"
 
-# Backup bestaande configs
-[ -f "$HOME/.zshrc" ] && cp "$HOME/.zshrc" "$HOME/.zshrc.backup.$(date +%Y%m%d_%H%M%S)"
+# Check of .zshrc al bestaat en vraag bevestiging
+if [ -f "$HOME/.zshrc" ]; then
+  echo "⚠️  Bestaande .zshrc gevonden"
+  read -p "Vervangen met nieuwe configuratie? (y/N): " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "ℹ️  .zshrc niet vervangen"
+    SKIP_ZSHRC=true
+  else
+    # Backup bestaande .zshrc
+    cp "$HOME/.zshrc" "$HOME/.zshrc.backup.$(date +%Y%m%d_%H%M%S)"
+    echo "💾 Backup gemaakt: ~/.zshrc.backup.$(date +%Y%m%d_%H%M%S)"
+  fi
+fi
+
+# Backup bestaande .p10k.zsh
 [ -f "$HOME/.p10k.zsh" ] && cp "$HOME/.p10k.zsh" "$HOME/.p10k.zsh.backup.$(date +%Y%m%d_%H%M%S)"
 
-# Download nieuwe configs met error handling
-if curl -fsSL "$REPO_URL/.zshrc" -o "$HOME/.zshrc.tmp"; then
-  mv "$HOME/.zshrc.tmp" "$HOME/.zshrc"
-  echo "✅ .zshrc gedownload"
+# Download .zshrc alleen als niet overgeslagen
+if [ "$SKIP_ZSHRC" != "true" ]; then
+  if curl -fsSL "$REPO_URL/.zshrc" -o "$HOME/.zshrc.tmp"; then
+    mv "$HOME/.zshrc.tmp" "$HOME/.zshrc"
+    echo "✅ .zshrc gedownload"
+  else
+    echo "❌ Fout bij downloaden van .zshrc"
+    exit 1
+  fi
 else
-  echo "❌ Fout bij downloaden van .zshrc"
-  exit 1
+  echo "⏭️  .zshrc download overgeslagen"
 fi
 
 if curl -fsSL "$REPO_URL/.p10k.zsh" -o "$HOME/.p10k.zsh.tmp"; then
