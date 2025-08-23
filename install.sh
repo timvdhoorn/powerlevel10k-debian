@@ -52,31 +52,24 @@ for name in "${!plugins[@]}"; do
   fi
 done
 
-# --- Nerd Font: MesloLGS NF ---
+# --- Nerd Font: JetBrainsMono NF ---
 FONT_DIR="$HOME/.local/share/fonts"
 mkdir -p "$FONT_DIR"
 
-echo "🔤 Installing MesloLGS Nerd Fonts..."
-MESLO_URL_BASE="https://github.com/romkatv/powerlevel10k-media/raw/master"
-fonts=(
-  "MesloLGS%20NF%20Regular.ttf"
-  "MesloLGS%20NF%20Bold.ttf"
-  "MesloLGS%20NF%20Italic.ttf"
-  "MesloLGS%20NF%20Bold%20Italic.ttf"
-)
+echo "🔤 Installing JetBrainsMono Nerd Font..."
+JETBRAINS_URL_BASE="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
+FONT_ZIP="JetBrainsMono.zip"
 
-for font in "${fonts[@]}"; do
-  # URL-decode de bestandsnaam voor lokale opslag
-  local_name=$(echo "$font" | sed 's/%20/ /g')
-  if [ ! -f "$FONT_DIR/$local_name" ]; then
-    echo "Downloading: $local_name"
-    curl -fsSL "$MESLO_URL_BASE/$font" -o "$FONT_DIR/$local_name"
-  fi
-done
+if [ ! -f "$FONT_DIR/JetBrainsMonoNerdFont-Regular.ttf" ]; then
+  echo "Downloading JetBrainsMono Nerd Font..."
+  curl -fsSL "$JETBRAINS_URL_BASE/$FONT_ZIP" -o "/tmp/$FONT_ZIP"
+  unzip -o "/tmp/$FONT_ZIP" -d "$FONT_DIR"
+  rm "/tmp/$FONT_ZIP"
+fi
 
 fc-cache -f "$FONT_DIR"
 
-echo "✅ Fonts geïnstalleerd. Zet je terminal-font op 'MesloLGS NF'."
+echo "✅ Font geïnstalleerd. Zet je terminal-font op 'JetBrainsMono Nerd Font'."
 
 # --- Configs downloaden ---
 REPO_URL="https://raw.githubusercontent.com/timvdhoorn/powerlevel10k-debian/main"
@@ -112,5 +105,5 @@ fi
 echo ""
 echo "✅ Setup voltooid!"
 echo "🔄 Start een nieuwe terminal of voer 'zsh' uit."
-echo "🎨 Configureer je terminal om 'MesloLGS NF' als font te gebruiken."
+echo "🎨 Configureer je terminal om 'JetBrainsMono Nerd Font' als font te gebruiken."
 echo ""
